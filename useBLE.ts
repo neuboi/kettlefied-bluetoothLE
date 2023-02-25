@@ -15,7 +15,7 @@ interface BluetoothLowEnergyApi {
     allDevice: Device[];
     connectToDevice: (deviceId: Device) => Promise<void>;
     connectedDevice: Device | null;
-    heartRate: number;
+    accelerometerData: number[];
     disconectFromDevice(): void;
 }
 
@@ -25,7 +25,7 @@ function useBLE(): BluetoothLowEnergyApi {
     const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
     
     // DATA COLLECTION --------------------------------------------------
-        const [heartRate, setHeartRate] = useState<number>(0);
+        const [accelerometerData, setAccelerometerData] = useState<number[]>([]);
     // DATA COLLECTION --------------------------------------------------
 
     const requestAndroid31Permissions = async () => {
@@ -133,7 +133,19 @@ function useBLE(): BluetoothLowEnergyApi {
             }
             
             // Data Stored In this Variable
-            console.log("Value: " + base64.decode(characteristic.value))
+            //console.log("Value: " + base64.decode(characteristic.value))
+
+            var data = base64.decode(characteristic.value);
+            var x = data.toString().substring(0, 6)
+            var y = data.toString().substring(7, 13)
+            var z = data.toString().substring(14)
+
+            var accelerometer_data = [parseInt(x), parseInt(y), parseInt(z)]
+
+            // Data Stored In this Variable
+            console.log("Value: " + accelerometer_data)
+
+            setAccelerometerData(accelerometer_data)
 
     }
 
@@ -157,7 +169,7 @@ function useBLE(): BluetoothLowEnergyApi {
         if(connectedDevice) {
             bleManager.cancelDeviceConnection(connectedDevice.id);
             setConnectedDevice(null);
-            setHeartRate(0);
+            setAccelerometerData([]);
         }
     }
 
@@ -167,7 +179,7 @@ function useBLE(): BluetoothLowEnergyApi {
         allDevice,
         connectToDevice,
         connectedDevice,
-        heartRate,
+        accelerometerData,
         disconectFromDevice,
     }
 }

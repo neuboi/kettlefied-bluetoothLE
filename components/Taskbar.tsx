@@ -20,7 +20,7 @@ export default function Taskbar() {
         allDevice,
         connectedDevice,
         connectToDevice,
-        heartRate,
+        accelerometerData,
         disconectFromDevice
       } = useBLE();
     
@@ -81,6 +81,7 @@ export default function Taskbar() {
             {/* <Text>{heartRate}</Text>                     */}
             {/* <Text>Connected to Kettlefied!: Your Heart Rate Is:</Text>
             <Text> {heartRate} bpm</Text> */}
+            <Text>{accelerometerData}</Text>
             <TouchableOpacity
             style={styles.taskbarButton}
             onPress={disconectFromDevice}

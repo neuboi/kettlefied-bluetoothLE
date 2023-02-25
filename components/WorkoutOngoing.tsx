@@ -5,7 +5,11 @@ import { Accelerometer } from 'expo-sensors';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
 import { Ionicons } from '@expo/vector-icons';
+import useBLE from "../useBLE";
 
+import { Audio, Video } from 'expo-av';
+
+let arduino = false;
 
 var workoutNumber = 0;
 let rep = 0;
@@ -25,6 +29,10 @@ export default function WorkoutOngoingPage () {
   const [text, setText] = useState("In progress...");
   const [workouttext, setWorkouttext] = useState("UP");
   const [shoot, setShoot] = useState(false);
+
+  const {
+    accelerometerData,
+  } = useBLE();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,28 +67,99 @@ export default function WorkoutOngoingPage () {
   }, [progress]);
 
   const playSound = async () => {
-    // const soundObject = new Audio.Sound();
-    // try {
-    //   await soundObject.loadAsync(require("./assets/success.mp3"));
-    //   await soundObject.playAsync();
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const soundObject = new Audio.Sound();
+    try {
+      // await soundObject.loadAsync(require("./assets/audio/success.mp3"));
+      // await soundObject.playAsync();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const [counter, setCounter] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
 
+
+
+
   useEffect(() => {
     const startAccelerometer = async () => {
-      await Accelerometer.addListener(accelerometerData => {
-        const { x, y, z } = accelerometerData;
-        
+
+      if (!arduino) {
+        await Accelerometer.addListener(accelerometerData => {
+          const { x, y, z } = accelerometerData;
+  
+          if (workoutNumber == 0) {
+            /*
+  
+              Kettlebell Swing Detection (0)
+  
+            */
+            // Check if phone is tilted towards the floor (Outward Swing)
+            if (z > 0.5 && !left && accelerometerDataCollect) { // Check if phone is tilted upwards (Starting Position)
+              console.log("Up")
+              setWorkouttext("UP")
+              setCounter(counter + 1);
+              left = true;
+              right = false;
+              rep += 0.5;
+            }
+            if (z < -0.5 && !right && accelerometerDataCollect) {
+              console.log("Dowm")
+              setWorkouttext("DOWN")
+              setCounter(counter + 1);
+              left = false;
+              right = true;
+              rep += 0.5;
+            } 
+          } else if (workoutNumber == 1) {
+            /*
+  
+              Kettlebell Russian Twist
+  
+            */
+            // Check if phone is tilted to the left
+            if (x < -0.5) {
+              console.log("Right")
+              setCounter(counter + 1);
+              left = false;
+              right = true;
+            } else if (x > 0.5) { // Check if phone is tilted to the right
+              console.log("Left")
+              setCounter(counter + 1);
+              left = true;
+              right = false;
+            }
+          } else if (workoutNumber == 2) {
+            /*
+  
+              Kettlebell Unknown Movement
+  
+            */
+            // Check if phone is tilted to the left
+            if (y < -0.5) {
+              console.log("Dpwm")
+              setCounter(counter + 1);
+              left = false;
+              right = true;
+            } else if (y > 0.5) { // Check if phone is tilted to the right
+              console.log("Up")
+              setCounter(counter + 1);
+              left = true;
+              right = false;
+            }
+          }
+        });
+      } else if (arduino) {
+        var x = accelerometerData[0];
+        var y = accelerometerData[1];
+        var z = accelerometerData[2];
+  
         if (workoutNumber == 0) {
           /*
-
+  
             Kettlebell Swing Detection (0)
-
+  
           */
           // Check if phone is tilted towards the floor (Outward Swing)
           if (z > 0.5 && !left && accelerometerDataCollect) { // Check if phone is tilted upwards (Starting Position)
@@ -101,9 +180,9 @@ export default function WorkoutOngoingPage () {
           } 
         } else if (workoutNumber == 1) {
           /*
-
+  
             Kettlebell Russian Twist
-
+  
           */
           // Check if phone is tilted to the left
           if (x < -0.5) {
@@ -119,9 +198,9 @@ export default function WorkoutOngoingPage () {
           }
         } else if (workoutNumber == 2) {
           /*
-
+  
             Kettlebell Unknown Movement
-
+  
           */
           // Check if phone is tilted to the left
           if (y < -0.5) {
@@ -136,7 +215,8 @@ export default function WorkoutOngoingPage () {
             right = false;
           }
         }
-      });
+      }
+      
     };
 
     startAccelerometer();
