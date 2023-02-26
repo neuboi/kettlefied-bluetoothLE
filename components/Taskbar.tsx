@@ -78,10 +78,6 @@ export default function Taskbar() {
       <View>
         {connectedDevice ? (
         <>
-            {/* <Text>{heartRate}</Text>                     */}
-            {/* <Text>Connected to Kettlefied!: Your Heart Rate Is:</Text>
-            <Text> {heartRate} bpm</Text> */}
-            <Text>{accelerometerData}</Text>
             <TouchableOpacity
             style={styles.taskbarButton}
             onPress={disconectFromDevice}
@@ -90,7 +86,6 @@ export default function Taskbar() {
             </TouchableOpacity>
         </>
         ) : (
-            // <Text>D</Text>
             <TouchableOpacity
             style={styles.taskbarButton}
             onPress={openModal}

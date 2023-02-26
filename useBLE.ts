@@ -8,6 +8,9 @@ const CHARACTERISTIC = "0000ffe1-0000-1000-8000-00805f9b34fb";
 import { useMemo, useState } from  "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { BleError, BleManager, Characteristic, Device } from "react-native-ble-plx"
+  
+export var globalAccelerometerData: number[];
+export var deviceConnected: boolean = false;
 
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>;
@@ -23,9 +26,9 @@ function useBLE(): BluetoothLowEnergyApi {
     const bleManager = useMemo(() => new BleManager(), [])
     const [allDevice, setAllDevices] = useState<Device[]>([])
     const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-    
+
     // DATA COLLECTION --------------------------------------------------
-        const [accelerometerData, setAccelerometerData] = useState<number[]>([]);
+    const [accelerometerData, setAccelerometerData] = useState<number[]>([]);
     // DATA COLLECTION --------------------------------------------------
 
     const requestAndroid31Permissions = async () => {
@@ -109,9 +112,10 @@ function useBLE(): BluetoothLowEnergyApi {
             setConnectedDevice(deviceConnection);
             await deviceConnection.discoverAllServicesAndCharacteristics();
             bleManager.stopDeviceScan();
+            deviceConnected = true;
             startStreamingData(deviceConnection)
         } catch (e) {
-            console.log("ERROR IN CONNECTIOn", e);
+            console.log(e);
         }
     };
     
@@ -119,11 +123,11 @@ function useBLE(): BluetoothLowEnergyApi {
         error: BleError | null,
         characteristic: Characteristic | null
         ) => {
-            console.log("Running onUpdate")
+            //console.log("Running onUpdate")
 
             if (error) {
-                console.log("Error Detected")
-                console.log(characteristic?.value)
+                //console.log("Error Detected")
+                //console.log(characteristic?.value)
 
                 console.log(error);
                 return
@@ -143,17 +147,19 @@ function useBLE(): BluetoothLowEnergyApi {
             var accelerometer_data = [parseInt(x), parseInt(y), parseInt(z)]
 
             // Data Stored In this Variable
-            console.log("Value: " + accelerometer_data)
+            //console.log("Value: " + accelerometer_data)
 
             setAccelerometerData(accelerometer_data)
+            globalAccelerometerData = accelerometer_data
+            deviceConnected = true;
 
     }
 
     const startStreamingData = async(device: Device) => {
         if(device) {
-            console.log("Device Found and Attempting Streamning")
-            console.log(device.name)
-            console.log(device.id)
+            //console.log("Device Found and Attempting Streamning")
+            //console.log(device.name)
+            //console.log(device.id)
             device.monitorCharacteristicForService(
                 UUID,
                 CHARACTERISTIC,
@@ -169,6 +175,7 @@ function useBLE(): BluetoothLowEnergyApi {
         if(connectedDevice) {
             bleManager.cancelDeviceConnection(connectedDevice.id);
             setConnectedDevice(null);
+            deviceConnected = false;
             setAccelerometerData([]);
         }
     }
@@ -183,5 +190,4 @@ function useBLE(): BluetoothLowEnergyApi {
         disconectFromDevice,
     }
 }
-
 export default useBLE;

@@ -10,7 +10,7 @@ import useBLE from './useBLE';
 import HomePage from './components/Home';
 import Taskbar from './components/Taskbar';
 import LeaderboardPage from './components/Leaderboard';
-import Header from './components/Header';
+// import Header from './components/Header';
 import WorkoutOngoingPage from './components/WorkoutOngoing';
 import AboutPage from './components/About';
 import StatsPage from './components/Stats';
