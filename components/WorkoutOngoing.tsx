@@ -12,7 +12,7 @@ import { Audio, Video } from 'expo-av';
 
 
 let baseNumber = 250;
-let marginOfError = 65;
+let marginOfError = 85;
 
 /*
   Arduino Accelerometer Values (Accelerometer Facing UP)
@@ -61,8 +61,8 @@ export default function WorkoutOngoingPage () {
     if (progressBarContinue != true || accelerometerDataCollect != true) {
       progressBarContinue = true;
       accelerometerDataCollect = true;
-      left = false;
-      right = false;
+      //left = false;
+      //right = false;
       rep = 0;
       setWorkouttext("UP");
       setCounter(0);

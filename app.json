@@ -31,7 +31,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.kettlefiedbluetooth"
     },
     "android": {
       "adaptiveIcon": {
@@ -47,6 +48,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fe3aa23e-f413-4e42-8a89-c85ef30bc0d2"
+      }
     }
   }
 }
